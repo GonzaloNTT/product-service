@@ -178,6 +178,8 @@ components:
           format: email
         phone:
           type: string
+        imei:
+          type: string
         documentType:
           type: string
           enum: [DNI, CEX, PASSPORT]
@@ -189,11 +191,11 @@ components:
         personalType:
           type: string
           enum: [STANDARD, VIP]
-          description: Solo para tipo PERSONAL
+          description: Solo para tipo PERSONAL. VIP requiere tener tarjeta de crédito.
         businessType:
           type: string
           enum: [STANDARD, PYME]
-          description: Solo para tipo BUSINESS
+          description: Solo para tipo BUSINESS. PYME requiere tener tarjeta de crédito para abrir cuenta corriente PYME.
     CustomerUpdateRequest:
       type: object
       properties:

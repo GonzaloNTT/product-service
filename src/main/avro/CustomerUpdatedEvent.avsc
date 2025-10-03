@@ -1,0 +1,9 @@
+{
+  "namespace": "com.bootcamp.customer_service.events",
+  "type": "record",
+  "name": "CustomerUpdatedEvent",
+  "fields": [
+    {"name": "customerId", "type": "string"},
+    {"name": "newEmail", "type": "string"}
+  ]
+}
