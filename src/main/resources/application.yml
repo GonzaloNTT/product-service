@@ -1,16 +1,16 @@
 server:
-  port: 0
+  port: 0  # Permite que el puerto se asigne automáticamente
 
 spring:
   application:
     name: product-service
   config:
-    import: optional:configserver:http://localhost:8888
+    import: optional:configserver:http://config-server:8888  # ✅ <--- CAMBIO CLAVE: antes decía localhost
   webflux:
     base-path: /api/v1
 
 kafka:
   topics:
-    customerCreated: product-created
+    customerCreated: customer-created
   groups:
-    customerService: product-service-group
+    customerService: customer-service-group
