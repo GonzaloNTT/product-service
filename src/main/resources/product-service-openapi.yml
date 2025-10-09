@@ -1,0 +1,445 @@
+openapi: 3.0.3
+info:
+  title: Banking API
+  description: API para producrt sercvice
+  version: 1.0.0
+paths:
+  /yanki/no-cliente:
+    post:
+      summary: Abrir Yanki con datos de no-cliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/YankiNoClienteRequest'
+      responses:
+        '201':
+          description: Yanki creado
+
+  /yanki/cliente:
+    post:
+      summary: Abrir Yanki con datos de cliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/YankiClienteRequest'
+      responses:
+        '201':
+          description: Yanki creado
+
+  /yanki/{id}:
+    delete:
+      summary: Cerrar Yanki
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminado
+
+  /yanki/no-cliente/{noClienteId}:
+    get:
+      summary: Obtener Yanki por no-cliente
+      parameters:
+        - name: noClienteId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Yanki encontrado
+
+  /yanki/cliente/{clienteId}:
+    get:
+      summary: Obtener Yanki por cliente
+      parameters:
+        - name: clienteId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Yanki encontrado
+
+  /tarjeta-debito:
+    post:
+      summary: Crear tarjeta débito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TarjetaDebitoRequest'
+      responses:
+        '201':
+          description: Creada
+
+  /tarjeta-debito/{id}:
+    delete:
+      summary: Eliminar tarjeta débito
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminada
+
+    get:
+      summary: Obtener tarjeta débito por id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Encontrada
+
+  /tarjeta-debito/{id}/cuenta-principal:
+    patch:
+      summary: Cambiar cuenta principal de tarjeta de débito
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                String:
+                  type: string
+      responses:
+        '200':
+          description: Cuenta principal actualizada correctamente
+
+  /tarjeta-credito:
+    post:
+      summary: Crear tarjeta crédito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TarjetaCreditoRequest'
+      responses:
+        '201':
+          description: Creada
+
+  /tarjeta-credito/{id}:
+    delete:
+      summary: Cerrar tarjeta crédito
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminada
+
+  /tarjeta-credito/cliente/{clienteId}:
+    get:
+      summary: Obtener tarjeta crédito por cliente
+      parameters:
+        - name: clienteId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Encontrada
+
+  /monedero:
+    post:
+      summary: Crear monedero BootCoin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonederoBootCoinRequest'
+      responses:
+        '201':
+          description: Creado
+
+  /monedero/{id}:
+    delete:
+      summary: Eliminar monedero BootCoin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminado
+
+  /monedero/cliente/{clienteId}:
+    get:
+      summary: Obtener monedero por cliente
+      parameters:
+        - name: clienteId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Encontrado
+
+  /cuenta/plazo-fijo:
+    post:
+      summary: Abrir cuenta plazo fijo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CuentaPlazoFijoRequest'
+      responses:
+        '201':
+          description: Creada
+
+  /cuenta/plazo-fijo/{id}:
+    delete:
+      summary: Cerrar cuenta plazo fijo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Cerrada
+
+  /cuenta/plazo-fijo/cliente/{clienteId}:
+    get:
+      summary: Obtener cuenta plazo fijo por cliente
+      parameters:
+        - name: clienteId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Encontrada
+
+  /cuenta/corriente:
+    post:
+      summary: Crear cuenta corriente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CuentaCorrienteRequest'
+      responses:
+        '201':
+          description: Creada
+
+  /cuenta/corriente/{id}:
+    delete:
+      summary: Eliminar cuenta corriente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminada
+
+  /cuenta/corriente/cliente/{clienteId}:
+    get:
+      summary: Obtener cuenta corriente por cliente
+      parameters:
+        - name: clienteId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Encontrada
+
+  /cuenta/ahorro:
+    post:
+      summary: Crear cuenta ahorro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CuentaAhorroRequest'
+      responses:
+        '201':
+          description: Creada
+
+  /cuenta/ahorro/{id}:
+    delete:
+      summary: Eliminar cuenta ahorro
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminada
+
+  /cuenta/ahorro/cliente/{clienteId}:
+    get:
+      summary: Obtener cuenta ahorro por cliente
+      parameters:
+        - name: clienteId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Encontrada
+
+  /credito:
+    post:
+      summary: Crear crédito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditoRequest'
+      responses:
+        '201':
+          description: Creado
+
+  /credito/{id}:
+    get:
+      summary: Obtener crédito por id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Encontrado
+
+components:
+  schemas:
+    YankiNoClienteRequest:
+      type: object
+      properties:
+        clienteId: { type: string }
+        tipoDocumento: { type: string }
+        numeroDocumento: { type: string }
+        telefono: { type: string }
+        imei: { type: string }
+        correo: { type: string }
+      required: [clienteId, tipoDocumento, numeroDocumento, telefono, imei, correo]
+
+    YankiClienteRequest:
+      type: object
+      properties:
+        clienteId: { type: string }
+        telefono: { type: string }
+        imei: { type: string }
+        correo: { type: string }
+      required: [clienteId, telefono, imei, correo]
+
+    TarjetaDebitoRequest:
+      type: object
+      properties:
+        clienteId: { type: string }
+        moneda: { type: string }
+        String: { type: string }
+      required: [clienteId, moneda, String]
+
+    CambiarCuentaPrincipalRequest:
+      type: object
+      properties:
+        String: { type: string }
+      required: [String]
+
+    TarjetaCreditoRequest:
+      type: object
+      properties:
+        clienteId: { type: string }
+        tipoTarjeta:
+          type: string
+          enum: [DEBITO, CREDITO]
+        moneda: { type: string }
+        limiteCredito: { type: number }
+      required: [clienteId, tipoTarjeta, moneda, limiteCredito]
+
+    MonederoBootCoinRequest:
+      type: object
+      properties:
+        clienteId: { type: string }
+        noClienteId: { type: string }
+        cuentaAsociadaId: { type: string }
+      required: [clienteId, cuentaAsociadaId]
+
+    CuentaPlazoFijoRequest:
+      type: object
+      properties:
+        clienteId: { type: string }
+        moneda: { type: string }
+      required: [clienteId, moneda]
+
+    CuentaCorrienteRequest:
+      type: object
+      properties:
+        clienteId: { type: string }
+        tipoCuentaCorriente:
+          type: string
+          enum: [NORMAL, PYME]
+        moneda: { type: string }
+      required: [clienteId, tipoCuentaCorriente, moneda]
+
+    CuentaAhorroRequest:
+      type: object
+      properties:
+        clienteId: { type: string }
+        tipoCuentaAhorro:
+          type: string
+          enum: [NORMAL, VIP]
+        moneda: { type: string }
+      required: [clienteId, tipoCuentaAhorro, moneda]
+
+    CreditoRequest:
+      type: object
+      properties:
+        clienteId: { type: string }
+        monto: { type: number, format: double }
+        moneda: { type: string }
+        tipoCredito:
+          type: string
+          enum: [PERSONAL, EMPRESARIAL]
+        plazo: { type: integer }
+      required: [clienteId, monto, moneda, tipoCredito, plazo]

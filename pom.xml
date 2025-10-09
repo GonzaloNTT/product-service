@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.bootcamp</groupId>
-	<artifactId>customer-service</artifactId>
+	<artifactId>product-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>customer-service</name>
-	<description>customer-service</description>
+	<name>product-service</name>
+	<description>product-service</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -29,7 +29,11 @@
 	<properties>
 		<java.version>21</java.version>
 		<spring-cloud.version>2024.0.2</spring-cloud.version>
-        <basePackage>com.bootcamp.customer_service</basePackage>
+        <basePackage>com.bootcamp.product_service</basePackage>
+        <!-- IMPORTANTE ESTO DEBE ESTAR EN UN PIPELINE DE CI/CD -->
+        <sonar.projectKey>product-service</sonar.projectKey>
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <sonar.login>sqa_537627a5490d582c8e1433422b043379ba2d622a</sonar.login>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -46,20 +50,21 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-streams</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
@@ -91,11 +96,6 @@
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
         <dependency>
@@ -139,6 +139,11 @@
             <artifactId>swagger-models</artifactId>
             <version>2.2.21</version>
         </dependency>
+        <dependency>
+            <groupId>com.bootcamp</groupId>
+            <artifactId>schemas-avro</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
     </dependencies>
     <repositories>
@@ -164,12 +169,32 @@
 
 	<build>
 		<plugins>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- Ruta dentro de resources -->
+                    <configLocation>checkstyle.xml</configLocation>
+                    <encoding>UTF-8</encoding>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                </configuration>
+            </plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-                    <mainClass>com.bootcamp.customer_service.CustomerServiceApplication</mainClass>
+                    <mainClass>com.bootcamp.product_service.ProductServiceApplication</mainClass>
                     <image>
 						<builder>paketobuildpacks/builder-jammy-base:latest</builder>
 					</image>
@@ -211,15 +236,15 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/customer-service-openapi.yml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/product-service-openapi.yml</inputSpec>
                             <generatorName>spring</generatorName>
-                            <modelPackage>com.bootcamp.customer_service.server.models</modelPackage>
-                            <apiPackage>com.bootcamp.customer_service.server</apiPackage>
+                            <modelPackage>com.bootcamp.product_service.server.models</modelPackage>
+                            <apiPackage>com.bootcamp.product_service.server</apiPackage>
                             <library>spring-boot</library>
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <sourceFolder>src/main/java</sourceFolder>
-                                <configPackage>com.bootcamp.customer_service.config</configPackage>
+                                <configPackage>com.bootcamp.product_service.config</configPackage>
                                 <dateLibrary>java8</dateLibrary>
                                 <useBeanValidation>false</useBeanValidation>
                                 <performBeanValidation>false</performBeanValidation>
@@ -229,7 +254,7 @@
                                 <asyncNative>true</asyncNative>
                                 <delegatePattern>true</delegatePattern>
                                 <serializationLibrary>jackson</serializationLibrary>
-                                <basePackage>com.bootcamp.customer_service</basePackage>
+                                <basePackage>com.bootcamp.product_service</basePackage>
                                 <generateModelTests>false</generateModelTests>
                                 <generateApiTests>false</generateApiTests>
                                 <addTestCompileSourceRoot>false</addTestCompileSourceRoot>
@@ -241,6 +266,31 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.11.0.3922</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -264,25 +314,6 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
-            </plugin>
-            <!-- Plugin para generar clases Avro -->
-            <plugin>
-                <groupId>org.apache.avro</groupId>
-                <artifactId>avro-maven-plugin</artifactId>
-                <version>1.11.3</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>schema</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirectory>${project.basedir}/src/main/avro</sourceDirectory>
-                            <outputDirectory>${project.basedir}/target/generated-sources/avro</outputDirectory>
-                            <stringType>String</stringType>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 		</plugins>
 	</build>
