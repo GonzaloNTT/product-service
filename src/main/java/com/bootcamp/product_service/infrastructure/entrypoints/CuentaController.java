@@ -60,7 +60,7 @@ public class CuentaController implements CuentaApi {
         return cuentaAhorroRequest
                 .flatMap(request -> {
                     // Mapear request a command
-                    CuentaAhorroCommand command = CommandMapper.toCommand(request);
+                    CuentaAhorroCommand command = CommandMapper.cuentaAhorroMapper.apply(request);
 
                     // Llamar al servicio
                     return cuentaAhorroService.create(command)

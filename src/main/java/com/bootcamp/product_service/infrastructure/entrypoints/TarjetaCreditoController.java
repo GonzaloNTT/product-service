@@ -53,7 +53,7 @@ public class TarjetaCreditoController implements TarjetaCreditoApi {
         return tarjetaCreditoRequest
                 .flatMap(request -> {
                     // Mapear request a command
-                    TarjetaCreditoCommand command = CommandMapper.toCommand(request);
+                    TarjetaCreditoCommand command = CommandMapper.tarjetaCreditoMapper.apply(request);
 
                     // Llamar al servicio
                     return service.create(command)

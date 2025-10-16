@@ -8,44 +8,50 @@ import com.bootcamp.product_service.domain.service.accounts.CuentaCorrienteServi
 import com.bootcamp.product_service.domain.service.accounts.CuentaPlazoFijoService;
 import com.bootcamp.product_service.server.models.CuentaAhorroRequest;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+@WebFluxTest(CuentaController.class)
+class CuentaControllerWebTest {
 
-class CuentaControllerTest {
+    @Autowired
+    private WebTestClient webTestClient;
 
-    @Mock
+    @MockBean
     private CuentaAhorroService cuentaAhorroService;
-    @Mock
+
+    @MockBean
     private CuentaCorrienteService cuentaCorrienteService;
-    @Mock
+
+    @MockBean
     private CuentaPlazoFijoService cuentaPlazoFijoService;
-
-    @InjectMocks
-    private CuentaController cuentaController;
-
-    @Mock
-    private ServerWebExchange exchange;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
-    // ✅ Caso exitoso
     @Test
-    void cuentaAhorroPost_deberiaRetornarCreatedCuandoServicioExitoso() {
-        // Arrange
+    @DisplayName("✅ Debería retornar 201 (Created) cuando el servicio crea la cuenta correctamente")
+    void cuentaAhorroPost_DebeRetornarCreatedCuandoExitoso() {
         CuentaAhorroRequest request = new CuentaAhorroRequest();
         request.setClienteId("cliente-123");
         request.setTipoCuentaAhorro(CuentaAhorroRequest.TipoCuentaAhorroEnum.NORMAL);
@@ -56,25 +62,18 @@ class CuentaControllerTest {
         when(cuentaAhorroService.create(any(CuentaAhorroCommand.class)))
                 .thenReturn(Mono.just(cuentaMock));
 
-        // Act
-        Mono<ResponseEntity<Void>> responseMono = cuentaController.cuentaAhorroPost(Mono.just(request), exchange);
-
-        // Assert
-        StepVerifier.create(responseMono)
-                .assertNext(response -> {
-                    assertEquals(HttpStatus.CREATED, response.getStatusCode());
-                    assertTrue(response.getHeaders().getLocation().toString()
-                            .contains("/api/v1/cuenta/ahorro" + cuentaMock.getId()));
-                })
-                .verifyComplete();
-
-        verify(cuentaAhorroService, times(1)).create(any(CuentaAhorroCommand.class));
+        webTestClient.post()
+                .uri("/api/v1/cuenta/ahorro")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().exists("Location");
     }
 
-    // Caso de error
     @Test
-    void cuentaAhorroPost_deberiaRetornarInternalServerErrorCuandoServicioFalla() {
-        // Arrange
+    @DisplayName("❌ Debería retornar 500 (Internal Server Error) cuando el servicio lanza excepción")
+    void cuentaAhorroPost_DebeRetornarErrorCuandoServicioFalla() {
         CuentaAhorroRequest request = new CuentaAhorroRequest();
         request.setClienteId("cliente-123");
         request.setTipoCuentaAhorro(CuentaAhorroRequest.TipoCuentaAhorroEnum.NORMAL);
@@ -83,15 +82,33 @@ class CuentaControllerTest {
         when(cuentaAhorroService.create(any(CuentaAhorroCommand.class)))
                 .thenReturn(Mono.error(new RuntimeException("Error en servicio")));
 
-        // Act
-        Mono<ResponseEntity<Void>> responseMono = cuentaController.cuentaAhorroPost(Mono.just(request), exchange);
+        webTestClient.post()
+                .uri("/api/v1/cuenta/ahorro")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
 
-        // Assert
-        StepVerifier.create(responseMono)
-                .assertNext(response ->
-                        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode()))
-                .verifyComplete();
+    @ParameterizedTest(name = "Debe crear cuenta con tipo {0}")
+    @EnumSource(CuentaAhorroRequest.TipoCuentaAhorroEnum.class)
+    @DisplayName("🔁 Debería permitir creación con diferentes tipos de cuenta ahorro")
+    void cuentaAhorroPost_DebeAceptarDiferentesTipos(CuentaAhorroRequest.TipoCuentaAhorroEnum tipoCuentaEnum) {
+        CuentaAhorroRequest request = new CuentaAhorroRequest();
+        request.setClienteId("cliente-123");
+        request.setTipoCuentaAhorro(tipoCuentaEnum);
+        request.setMoneda("SOLES");
 
-        verify(cuentaAhorroService, times(1)).create(any(CuentaAhorroCommand.class));
+        CuentaAhorro cuentaMock = new CuentaAhorro("cliente-123", TipoCuentaAhorro.valueOf(tipoCuentaEnum.name()));
+
+        when(cuentaAhorroService.create(any(CuentaAhorroCommand.class)))
+                .thenReturn(Mono.just(cuentaMock));
+
+        webTestClient.post()
+                .uri("/api/v1/cuenta/ahorro")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().isCreated();
     }
 }

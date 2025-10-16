@@ -3,6 +3,7 @@ import com.bootcamp.product_service.application.mapper.command.*;
 import com.bootcamp.product_service.domain.enums.TipoCredito;
 import com.bootcamp.product_service.domain.enums.TipoCuentaAhorro;
 import com.bootcamp.product_service.server.models.*;
+import java.util.function.Function;
 
 import java.math.BigDecimal;
 
@@ -10,91 +11,82 @@ public class CommandMapper {
 
     private CommandMapper() {}
 
-    public static YankiCommand toCommand(YankiClienteRequest request) {
-        return new YankiCommand(
-                request.getClienteId(),
-                null,
-                null,
-                request.getTelefono(),
-                request.getImei(),
-                request.getCorreo()
-        );
-    }
+    public static final Function<YankiClienteRequest, YankiCommand> yankiClienteMapper =
+            req -> new YankiCommand(
+                    req.getClienteId(),
+                    null,
+                    null,
+                    req.getTelefono(),
+                    req.getImei(),
+                    req.getCorreo()
+            );
 
-    public static YankiCommand toCommand(YankiNoClienteRequest request) {
-        return new YankiCommand(
-                request.getClienteId(),
-                request.getTipoDocumento(),
-                request.getNumeroDocumento(),
-                request.getTelefono(),
-                request.getImei(),
-                request.getCorreo()
-        );
-    }
+    public static final Function<YankiNoClienteRequest, YankiCommand> yankiNoClienteMapper =
+            req -> new YankiCommand(
+                    req.getClienteId(),
+                    req.getTipoDocumento(),
+                    req.getNumeroDocumento(),
+                    req.getTelefono(),
+                    req.getImei(),
+                    req.getCorreo()
+            );
 
-    public static TarjetaDebitoCommand toCommand(TarjetaDebitoRequest request) {
-        return new TarjetaDebitoCommand(
-                request.getClienteId(),
-                request.getMoneda(),
-                request.getString()
-        );
-    }
+    public static final Function<TarjetaDebitoRequest, TarjetaDebitoCommand> tarjetaDebitoMapper =
+            req -> new TarjetaDebitoCommand(
+                    req.getClienteId(),
+                    req.getMoneda(),
+                    req.getString()
+            );
 
-    public static TarjetaDebitoCommand toCommand(TarjetaDebitoIdCuentaPrincipalPatchRequest request) {
-        return new TarjetaDebitoCommand(
-                null,
-                null,
-                request.getString()
-        );
-    }
+    public static final Function<TarjetaDebitoIdCuentaPrincipalPatchRequest, TarjetaDebitoCommand> tarjetaDebitoPatchMapper =
+            req -> new TarjetaDebitoCommand(
+                    null,
+                    null,
+                    req.getString()
+            );
 
-    public static TarjetaCreditoCommand toCommand(TarjetaCreditoRequest request) {
-        return new TarjetaCreditoCommand(
-                request.getClienteId(),
-                null,
-                request.getMoneda(),
-                request.getLimiteCredito()
-        );
-    }
+    // ---- Tarjeta Crédito ----
+    public static final Function<TarjetaCreditoRequest, TarjetaCreditoCommand> tarjetaCreditoMapper =
+            req -> new TarjetaCreditoCommand(
+                    req.getClienteId(),
+                    null,
+                    req.getMoneda(),
+                    req.getLimiteCredito()
+            );
 
-    public static MonederoBootCoinCommand toCommand(MonederoBootCoinRequest request) {
-        return new MonederoBootCoinCommand(
-                request.getClienteId(),
-                request.getNoClienteId(),
-                request.getCuentaAsociadaId()
-        );
-    }
+    public static final Function<MonederoBootCoinRequest, MonederoBootCoinCommand> monederoBootCoinMapper =
+            req -> new MonederoBootCoinCommand(
+                    req.getClienteId(),
+                    req.getNoClienteId(),
+                    req.getCuentaAsociadaId()
+            );
 
-    public static CuentaPlazoFijoCommand toCommand(CuentaPlazoFijoRequest request) {
-        return new CuentaPlazoFijoCommand(
-                request.getClienteId(),
-                request.getMoneda()
-        );
-    }
+    public static final Function<CuentaPlazoFijoRequest, CuentaPlazoFijoCommand> cuentaPlazoFijoMapper =
+            req -> new CuentaPlazoFijoCommand(
+                    req.getClienteId(),
+                    req.getMoneda()
+            );
 
-    public static CuentaCorrienteCommand toCommand(CuentaCorrienteRequest request) {
-        return new CuentaCorrienteCommand(
-                request.getClienteId(),
-                null,
-                request.getMoneda()
-        );
-    }
+    public static final Function<CuentaCorrienteRequest, CuentaCorrienteCommand> cuentaCorrienteMapper =
+            req -> new CuentaCorrienteCommand(
+                    req.getClienteId(),
+                    null,
+                    req.getMoneda()
+            );
 
-    public static CuentaAhorroCommand toCommand(CuentaAhorroRequest request) {
-        return new CuentaAhorroCommand(
-                request.getClienteId(),
-                TipoCuentaAhorro.valueOf(request.getTipoCuentaAhorro().name()),
-                request.getMoneda()
-        );
-    }
+    public static final Function<CuentaAhorroRequest, CuentaAhorroCommand> cuentaAhorroMapper =
+            req -> new CuentaAhorroCommand(
+                    req.getClienteId(),
+                    TipoCuentaAhorro.valueOf(req.getTipoCuentaAhorro().name()),
+                    req.getMoneda()
+            );
 
-    public static CreditoCommand toCommand(CreditoRequest request) {
-        return new CreditoCommand(
-                request.getClienteId(),
-                request.getMonto() != null ? BigDecimal.valueOf(request.getMonto()) : BigDecimal.ZERO,
-                request.getMoneda(),
-                TipoCredito.valueOf(request.getTipoCredito().getValue()),
-                request.getPlazo()
-        );
-    }
+    public static final Function<CreditoRequest, CreditoCommand> creditoMapper =
+            req -> new CreditoCommand(
+                    req.getClienteId(),
+                    req.getMonto() != null ? BigDecimal.valueOf(req.getMonto()) : BigDecimal.ZERO,
+                    req.getMoneda(),
+                    TipoCredito.valueOf(req.getTipoCredito().getValue()),
+                    req.getPlazo()
+            );
 }

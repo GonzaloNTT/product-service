@@ -2,6 +2,7 @@ package com.bootcamp.product_service.infrastructure.entrypoints;
 
 import com.bootcamp.product_service.application.mapper.CommandMapper;
 import com.bootcamp.product_service.application.mapper.command.CreditoCommand;
+import com.bootcamp.product_service.application.mapper.command.TarjetaCreditoCommand;
 import com.bootcamp.product_service.domain.service.credit.CreditoService;
 import com.bootcamp.product_service.server.CreditoApi;
 import com.bootcamp.product_service.server.models.CreditoRequest;
@@ -40,7 +41,7 @@ public class CreditoController implements CreditoApi {
         return creditoRequest
                 .flatMap(request -> {
                     // Mapear request a command
-                    CreditoCommand command = CommandMapper.toCommand(request);
+                    CreditoCommand command = CommandMapper.creditoMapper.apply(request);
 
                     // Llamar al servicio
                     return service.create(command)

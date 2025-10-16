@@ -26,5 +26,7 @@ public class CustomerEventConsumer {
                 .doOnError(e -> log.error("❌ Error procesando GastoEvent: {}", event, e))
                 .subscribe();
     }
+
+
 }
 
